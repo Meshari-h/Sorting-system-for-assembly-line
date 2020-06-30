@@ -1,0 +1,72 @@
+#include <Servo.h>
+
+Servo servo_3;
+
+int cm1 = 0;
+int cm2 = 0;
+int freeSpace;
+int box;
+
+long readUltrasonicDistance1(int triggerPin1, int echoPin1)
+
+{
+  pinMode(triggerPin1, OUTPUT);  
+  digitalWrite(triggerPin1, LOW);
+  delayMicroseconds(2);
+  digitalWrite(triggerPin1, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin1, LOW);
+  pinMode(echoPin1, INPUT);
+  return pulseIn(echoPin1, HIGH);
+}
+
+long readUltrasonicDistance2(int triggerPin2, int echoPin2)
+
+{
+  pinMode(triggerPin2, OUTPUT);  
+  digitalWrite(triggerPin2, LOW);
+  delayMicroseconds(2);
+  digitalWrite(triggerPin2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(triggerPin2, LOW);
+  pinMode(echoPin2, INPUT);
+  return pulseIn(echoPin2, HIGH);
+}
+
+void setup()
+{
+  Serial.begin(9600);
+  servo_3.attach(3);
+
+}
+
+void loop()
+{
+  
+  // measure the ping time in cm
+  cm1 = 0.01723 * readUltrasonicDistance1(6, 6);
+  cm2 = 0.01723 * readUltrasonicDistance2(5, 5);
+ 
+  freeSpace= cm1+cm2;
+  box= 300-freeSpace; //box size
+    
+  Serial.print(box);
+  Serial.println(" box");
+  
+  if (box<300 && box>200){
+  Serial.println("Large");
+      servo_3.write(100); //send large box to the middle
+  }
+  if (box<200 && box>100){
+  Serial.println("Medium");
+      servo_3.write(10); //send medium box to the left
+  }
+  if (box<100 && box>10){
+  Serial.println("Small");
+      servo_3.write(200); //send small box to the right
+  }
+  
+  delay(1000); 
+}
+
+//https://www.tinkercad.com/things/hLdSdNDJd4y
